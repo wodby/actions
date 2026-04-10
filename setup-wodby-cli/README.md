@@ -64,8 +64,8 @@ jobs:
 ## Notes
 
 - `app-service-id` is optional. If you omit it, the action only installs the CLI and exports environment variables.
-- By default the action asks Wodby backend which CLI version should be installed, then downloads the matching GitHub release asset directly.
-- If you want reproducible builds without backend dependency, set `cli-version` explicitly.
+- The action installs the CLI through Wodby backend installer and passes runner `os`, `arch`, and `cli-version` to the backend request.
+- If you want reproducible installs, set `cli-version` explicitly.
 - The action does not run `build`, `release`, or
   `deploy` for you. Those remain explicit workflow steps because they are project-specific.
 - `wodby ci init` requires Docker access later in the workflow, so use an Ubuntu runner for the actual build pipeline.
