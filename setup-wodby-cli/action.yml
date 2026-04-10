@@ -1,0 +1,56 @@
+name: Setup Wodby CLI
+description: Install Wodby CLI for the current runner, export Wodby env vars, and optionally run `wodby ci init`.
+
+inputs:
+  api-key:
+    description: Wodby API key used by the CLI.
+    required: true
+  app-service-id:
+    description: Wodby app service ID. When provided, the action runs `wodby ci init` with this value.
+    required: false
+    default: ""
+  api-host:
+    description: Wodby API host used to derive internal endpoints.
+    required: false
+    default: https://apiv2.wodby.com
+  cli-version:
+    description: Exact Wodby CLI version to install. When omitted, the action resolves the default version via Wodby API.
+    required: false
+    default: ""
+  verbose:
+    description: Export `WODBY_VERBOSE=true` for subsequent CLI commands.
+    required: false
+    default: "false"
+  working-directory:
+    description: Working directory used for `wodby ci init`.
+    required: false
+    default: .
+
+runs:
+  using: composite
+  steps:
+    - name: Install Wodby CLI
+      shell: bash
+      run: ${{ github.action_path }}/scripts/install.sh
+      env:
+        INPUT_API_HOST: ${{ inputs.api-host }}
+        INPUT_CLI_VERSION: ${{ inputs.cli-version }}
+
+    - name: Export Wodby environment
+      shell: bash
+      run: ${{ github.action_path }}/scripts/export-env.sh
+      env:
+        INPUT_API_KEY: ${{ inputs.api-key }}
+        INPUT_APP_SERVICE_ID: ${{ inputs.app-service-id }}
+        INPUT_API_HOST: ${{ inputs.api-host }}
+        INPUT_VERBOSE: ${{ inputs.verbose }}
+
+    - name: Initialize Wodby CI
+      if: ${{ inputs.app-service-id != '' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: ${{ github.action_path }}/scripts/init.sh
+      env:
+        INPUT_APP_SERVICE_ID: ${{ inputs.app-service-id }}
+        WODBY_API_KEY: ${{ inputs.api-key }}
+        INPUT_API_HOST: ${{ inputs.api-host }}
