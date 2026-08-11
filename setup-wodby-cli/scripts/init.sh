@@ -23,6 +23,7 @@ if [[ -z "${app_service_id}" ]]; then
   exit 1
 fi
 
-export WODBY_API_ENDPOINT="${WODBY_API_ENDPOINT:-$(normalize_api_host "${api_host}")/query}"
+unset WODBY_API_ENDPOINT
+export WODBY_API_BASE_URL="${WODBY_API_BASE_URL:-$(normalize_api_host "${api_host}")/v1}"
 
 wodby ci init "${app_service_id}"

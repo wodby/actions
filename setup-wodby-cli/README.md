@@ -1,7 +1,7 @@
 # `setup-wodby-cli`
 
 Installs the [Wodby CLI](https://github.com/wodby/wodby-cli), exports
-`WODBY_API_KEY` for later workflow steps, and optionally runs `wodby ci init`.
+`WODBY_API_KEY` and `WODBY_API_BASE_URL` for later workflow steps, and optionally runs `wodby ci init`.
 
 This action is intended for GitHub-hosted Linux runners, which match the VM-based pattern already used by the CircleCI examples in [
 `wodby/wodby-ci`](https://github.com/wodby/wodby-ci).
@@ -64,6 +64,7 @@ jobs:
 ## Notes
 
 - `app-service-id` is optional. If you omit it, the action only installs the CLI and exports environment variables.
+- The action derives the REST API base URL from `api-host` and exports it as `WODBY_API_BASE_URL`.
 - The action installs the CLI through Wodby backend installer and passes runner `os`, `arch`, and `cli-version` to the backend request.
 - If you want reproducible installs, set `cli-version` explicitly.
 - The action does not run `build`, `release`, or

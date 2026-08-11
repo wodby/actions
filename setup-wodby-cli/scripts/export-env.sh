@@ -29,7 +29,8 @@ echo "::add-mask::${api_key}"
 
 {
   printf 'WODBY_API_KEY<<__WODBY_API_KEY__\n%s\n__WODBY_API_KEY__\n' "${api_key}"
-  printf 'WODBY_API_ENDPOINT=%s/query\n' "$(normalize_api_host "${api_host}")"
+  printf 'WODBY_API_BASE_URL=%s/v1\n' "$(normalize_api_host "${api_host}")"
+  printf 'WODBY_API_ENDPOINT=\n'
 
   if [[ -n "${app_service_id}" ]]; then
     printf 'WODBY_APP_SERVICE_ID=%s\n' "${app_service_id}"
