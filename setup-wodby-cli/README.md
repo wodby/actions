@@ -15,7 +15,7 @@ This action is intended for GitHub-hosted Linux runners, which match the VM-base
 | `cli-version`       | no       | `""`    | Exact CLI version to install, for example `2.2.0`. When omitted, the action resolves the default version automatically. |
 | `verbose`           | no       | `false` | When `true`, exports `WODBY_VERBOSE=true`.                                                                              |
 | `working-directory` | no       | `.`     | Directory from which `wodby ci init` is executed.                                                                       |
-| `cache`             | no       | `auto`  | Restores caches detected from lockfiles. Use `none` or a comma-separated list of `npm`, `composer`, and `uv` to override. |
+| `cache`             | no       | `auto`  | Restores caches detected from lockfiles. Use `none` or a comma-separated list of `npm`, `composer`, `bundler`, and `uv` to override. |
 
 ## Usage
 
@@ -58,8 +58,9 @@ jobs:
 ## Notes
 
 - `app-service-id` is optional. If you omit it, the action only installs the CLI and exports environment variables.
-- With the default `cache: auto`, the action restores npm, Composer, and uv caches when it finds `package-lock.json`,
-  `composer.lock`, or `uv.lock`. `wodby ci run` automatically mounts the matching cache for supported images.
+- With the default `cache: auto`, the action restores npm, Composer, Bundler, and uv caches when it finds
+  `package-lock.json`, `composer.lock`, `Gemfile.lock`, or `uv.lock`. `wodby ci run` automatically mounts the matching
+  cache for supported images.
 - Set `cache: none` to disable dependency caching, or set an explicit list such as `cache: npm,composer` when lockfiles
   are generated later in the job.
 - The action derives the REST API base URL from `api-host` and exports it as `WODBY_API_BASE_URL`.

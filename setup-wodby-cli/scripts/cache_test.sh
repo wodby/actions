@@ -12,6 +12,7 @@ mkdir -p "${project}/node_modules/nested"
 touch \
   "${project}/package-lock.json" \
   "${project}/composer.lock" \
+  "${project}/Gemfile.lock" \
   "${project}/node_modules/nested/uv.lock"
 
 run_cache() {
@@ -34,16 +35,19 @@ assert_output() {
 run_cache auto
 assert_output npm true
 assert_output composer true
+assert_output bundler true
 assert_output uv false
 
-run_cache 'UV,npm'
+run_cache 'UV,npm,bundler'
 assert_output npm true
 assert_output composer false
+assert_output bundler true
 assert_output uv true
 
 run_cache none
 assert_output npm false
 assert_output composer false
+assert_output bundler false
 assert_output uv false
 
 if run_cache pnpm 2>/dev/null; then

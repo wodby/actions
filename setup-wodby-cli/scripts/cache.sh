@@ -19,6 +19,7 @@ fi
 
 npm=false
 composer=false
+bundler=false
 uv=false
 
 has_lockfile() {
@@ -33,11 +34,14 @@ enable_profile() {
     composer)
       composer=true
       ;;
+    bundler)
+      bundler=true
+      ;;
     uv)
       uv=true
       ;;
     *)
-      echo "Unknown cache profile: $1 (supported: npm, composer, uv)" >&2
+      echo "Unknown cache profile: $1 (supported: npm, composer, bundler, uv)" >&2
       exit 1
       ;;
   esac
@@ -47,6 +51,7 @@ case "${cache_lower}" in
   auto)
     if has_lockfile package-lock.json; then npm=true; fi
     if has_lockfile composer.lock; then composer=true; fi
+    if has_lockfile Gemfile.lock; then bundler=true; fi
     if has_lockfile uv.lock; then uv=true; fi
     ;;
   none|false|off)
@@ -64,5 +69,6 @@ esac
 {
   printf 'npm=%s\n' "${npm}"
   printf 'composer=%s\n' "${composer}"
+  printf 'bundler=%s\n' "${bundler}"
   printf 'uv=%s\n' "${uv}"
 } >> "${GITHUB_OUTPUT}"
