@@ -25,10 +25,49 @@ inputs:
     description: Working directory used for `wodby ci init`.
     required: false
     default: .
+  cache:
+    description: Dependency caches to restore. Use auto, none, or a comma-separated list of npm, composer, and uv.
+    required: false
+    default: auto
 
 runs:
   using: composite
   steps:
+    - name: Detect dependency caches
+      id: cache
+      shell: bash
+      run: ${{ github.action_path }}/scripts/cache.sh
+      env:
+        INPUT_CACHE: ${{ inputs.cache }}
+        INPUT_WORKING_DIRECTORY: ${{ inputs.working-directory }}
+
+    - name: Restore npm cache
+      if: ${{ steps.cache.outputs.npm == 'true' }}
+      uses: actions/cache@v5
+      with:
+        path: ~/.npm
+        key: wodby-${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          wodby-${{ runner.os }}-${{ runner.arch }}-npm-
+
+    - name: Restore Composer cache
+      if: ${{ steps.cache.outputs.composer == 'true' }}
+      uses: actions/cache@v5
+      with:
+        path: ~/.composer/cache
+        key: wodby-${{ runner.os }}-${{ runner.arch }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          wodby-${{ runner.os }}-${{ runner.arch }}-composer-
+
+    - name: Restore uv cache
+      if: ${{ steps.cache.outputs.uv == 'true' }}
+      uses: actions/cache@v5
+      with:
+        path: ~/.cache/uv
+        key: wodby-${{ runner.os }}-${{ runner.arch }}-uv-${{ hashFiles('**/uv.lock') }}
+        restore-keys: |
+          wodby-${{ runner.os }}-${{ runner.arch }}-uv-
+
     - name: Install Wodby CLI
       shell: bash
       run: ${{ github.action_path }}/scripts/install.sh

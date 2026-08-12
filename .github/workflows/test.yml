@@ -1,0 +1,22 @@
+name: Test actions
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check shell syntax
+        run: bash -n setup-wodby-cli/scripts/*.sh
+
+      - name: Test cache profile detection
+        run: setup-wodby-cli/scripts/cache_test.sh

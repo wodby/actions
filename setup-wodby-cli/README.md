@@ -15,6 +15,7 @@ This action is intended for GitHub-hosted Linux runners, which match the VM-base
 | `cli-version`       | no       | `""`    | Exact CLI version to install, for example `2.2.0`. When omitted, the action resolves the default version automatically. |
 | `verbose`           | no       | `false` | When `true`, exports `WODBY_VERBOSE=true`.                                                                              |
 | `working-directory` | no       | `.`     | Directory from which `wodby ci init` is executed.                                                                       |
+| `cache`             | no       | `auto`  | Restores caches detected from lockfiles. Use `none` or a comma-separated list of `npm`, `composer`, and `uv` to override. |
 
 ## Usage
 
@@ -34,14 +35,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/cache@v4
-        with:
-          path: ~/.composer
-          key: composer-${{ hashFiles('composer.lock') }}
-          restore-keys: |
-            composer-
+      - uses: actions/checkout@v6
 
       - uses: wodby/actions/setup-wodby-cli@v1
         with:
@@ -49,7 +43,7 @@ jobs:
           app-service-id: your-app-service-id
 
       - name: Install dependencies
-        run: wodby ci run -v "$HOME/.composer:/home/wodby/.composer" -- composer install -n
+        run: wodby ci run -- composer install -n
 
       - name: Build images
         run: wodby ci build
@@ -64,6 +58,10 @@ jobs:
 ## Notes
 
 - `app-service-id` is optional. If you omit it, the action only installs the CLI and exports environment variables.
+- With the default `cache: auto`, the action restores npm, Composer, and uv caches when it finds `package-lock.json`,
+  `composer.lock`, or `uv.lock`. `wodby ci run` automatically mounts the matching cache for supported images.
+- Set `cache: none` to disable dependency caching, or set an explicit list such as `cache: npm,composer` when lockfiles
+  are generated later in the job.
 - The action derives the REST API base URL from `api-host` and exports it as `WODBY_API_BASE_URL`.
 - The action installs the CLI through Wodby backend installer and passes runner `os`, `arch`, and `cli-version` to the backend request.
 - If you want reproducible installs, set `cli-version` explicitly.
