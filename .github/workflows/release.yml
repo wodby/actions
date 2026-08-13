@@ -1,21 +1,22 @@
-name: Test actions
+name: Publish action version aliases
 
 on:
-  pull_request:
   push:
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  test:
+  release:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
-      - name: Check shell syntax
+      - name: Validate shell syntax
         run: bash -n .github/scripts/*.sh setup-wodby-cli/scripts/*.sh
 
       - name: Test action version aliases
@@ -26,3 +27,6 @@ jobs:
 
       - name: Test cache profile detection
         run: setup-wodby-cli/scripts/cache_test.sh
+
+      - name: Publish compatible version aliases
+        run: .github/scripts/update-version-aliases.sh "${GITHUB_REF_NAME}"
