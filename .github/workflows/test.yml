@@ -18,5 +18,8 @@ jobs:
       - name: Check shell syntax
         run: bash -n setup-wodby-cli/scripts/*.sh
 
+      - name: Test Wodby CLI installer
+        run: setup-wodby-cli/scripts/install_test.sh
+
       - name: Test cache profile detection
         run: setup-wodby-cli/scripts/cache_test.sh

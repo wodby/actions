@@ -14,7 +14,7 @@ inputs:
     required: false
     default: https://apiv2.wodby.com
   cli-version:
-    description: Exact Wodby CLI version to install. When omitted, the action resolves the default version via Wodby API.
+    description: Exact Wodby CLI version to install. When omitted, the action installs the latest Wodby 2 release from GitHub.
     required: false
     default: ""
   verbose:
@@ -81,7 +81,6 @@ runs:
       shell: bash
       run: ${{ github.action_path }}/scripts/install.sh
       env:
-        INPUT_API_HOST: ${{ inputs.api-host }}
         INPUT_CLI_VERSION: ${{ inputs.cli-version }}
 
     - name: Export Wodby environment

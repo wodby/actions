@@ -12,7 +12,7 @@ This action is intended for GitHub-hosted Linux runners, which match the VM-base
 |---------------------|----------|---------|-------------------------------------------------------------------------------------------------------------------------|
 | `api-key`           | yes      |         | Wodby API key. The action exports it as `WODBY_API_KEY` for subsequent steps.                                           |
 | `app-service-id`    | no       | `""`    | When provided, the action runs `wodby ci init <app-service-id>`.                                                        |
-| `cli-version`       | no       | `""`    | Exact CLI version to install, for example `2.2.0`. When omitted, the action resolves the default version automatically. |
+| `cli-version`       | no       | `""`    | Exact CLI version to install, for example `2.8.0`. When omitted, the action installs the latest Wodby 2 release.        |
 | `verbose`           | no       | `false` | When `true`, exports `WODBY_VERBOSE=true`.                                                                              |
 | `working-directory` | no       | `.`     | Directory from which `wodby ci init` is executed.                                                                       |
 | `cache`             | no       | `auto`  | Restores caches detected from lockfiles. Use `none` or a comma-separated list of `npm`, `composer`, `bundler`, and `uv` to override. |
@@ -64,7 +64,7 @@ jobs:
 - Set `cache: none` to disable dependency caching, or set an explicit list such as `cache: npm,composer` when lockfiles
   are generated later in the job.
 - The action derives the REST API base URL from `api-host` and exports it as `WODBY_API_BASE_URL`.
-- The action installs the CLI through Wodby backend installer and passes runner `os`, `arch`, and `cli-version` to the backend request.
+- The action downloads the runner-specific CLI archive directly from GitHub Releases. GitHub's latest release tracks Wodby 2.
 - If you want reproducible installs, set `cli-version` explicitly.
 - The action does not run `build`, `release`, or
   `deploy` for you. Those remain explicit workflow steps because they are project-specific.

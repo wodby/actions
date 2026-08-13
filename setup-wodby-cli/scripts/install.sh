@@ -3,22 +3,9 @@
 set -euo pipefail
 
 version="${INPUT_CLI_VERSION:-}"
-api_host="${INPUT_API_HOST:-https://apiv2.wodby.com}"
 runner_os="${RUNNER_OS:-}"
 runner_arch="${RUNNER_ARCH:-}"
-
-normalize_api_host() {
-  local value="${1%/}"
-
-  case "${value}" in
-    http://*|https://*)
-      printf '%s\n' "${value}"
-      ;;
-    *)
-      printf 'https://%s\n' "${value}"
-      ;;
-  esac
-}
+install_dir="${WODBY_CLI_INSTALL_DIR:-/usr/local/bin}"
 
 case "${runner_os}" in
   Linux)
@@ -28,7 +15,7 @@ case "${runner_os}" in
     os="darwin"
     ;;
   Windows)
-    echo "The Wodby backend installer does not currently provide a Windows-specific install script" >&2
+    echo "The Wodby CLI setup action does not currently support Windows runners" >&2
     exit 1
     ;;
   *)
@@ -50,16 +37,26 @@ case "${runner_arch}" in
     ;;
 esac
 
-backend_url="$(normalize_api_host "${api_host}")/v1/get/cli?os=${os}&arch=${arch}"
+release_path="latest/download"
 if [[ -n "${version}" ]]; then
-  backend_url="${backend_url}&version=${version#v}"
+  release_path="download/${version#v}"
 fi
 
-echo "Installing Wodby CLI via ${backend_url}"
-curl -fsSL "${backend_url}" | sh
+cli_url="https://github.com/wodby/wodby-cli/releases/${release_path}/wodby-${os}-${arch}.tar.gz"
+tar_command=(tar xz -C "${install_dir}")
+if [[ ! -w "${install_dir}" ]]; then
+  if ! command -v sudo >/dev/null 2>&1; then
+    echo "Wodby CLI install directory is not writable and sudo is unavailable: ${install_dir}" >&2
+    exit 1
+  fi
+  tar_command=(sudo "${tar_command[@]}")
+fi
+
+echo "Installing Wodby CLI from ${cli_url}"
+curl -fsSL "${cli_url}" | "${tar_command[@]}"
 
 if ! command -v wodby >/dev/null 2>&1; then
-  echo "Wodby CLI was not found on PATH after running the backend installer" >&2
+  echo "Wodby CLI was not found on PATH after extracting the GitHub release" >&2
   exit 1
 fi
 
