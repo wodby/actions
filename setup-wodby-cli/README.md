@@ -48,8 +48,8 @@ jobs:
       - name: Build images
         run: wodby ci build
 
-      - name: Release images
-        run: wodby ci release
+      - name: Push images
+        run: wodby ci push
 
       - name: Deploy
         run: wodby ci deploy
