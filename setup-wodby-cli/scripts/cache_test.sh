@@ -37,6 +37,22 @@ assert_output npm true
 assert_output composer true
 assert_output bundler true
 assert_output uv false
+assert_output nuget false
+
+# A .NET project selects the NuGet cache with or without a lock file.
+mkdir -p "${project}/src/App"
+touch "${project}/src/App/App.csproj"
+run_cache auto
+assert_output nuget true
+touch "${project}/src/App/packages.lock.json"
+rm "${project}/src/App/App.csproj"
+run_cache auto
+assert_output nuget true
+rm -r "${project}/src"
+
+run_cache nuget
+assert_output nuget true
+assert_output npm false
 
 run_cache 'UV,npm,bundler'
 assert_output npm true
@@ -49,6 +65,7 @@ assert_output npm false
 assert_output composer false
 assert_output bundler false
 assert_output uv false
+assert_output nuget false
 
 if run_cache pnpm 2>/dev/null; then
   echo "Unknown cache profile unexpectedly succeeded" >&2
