@@ -26,7 +26,7 @@ inputs:
     required: false
     default: .
   cache:
-    description: Dependency caches to restore. Use auto, none, or a comma-separated list of npm, composer, bundler, and uv.
+    description: Dependency caches to restore. Use auto, none, or a comma-separated list of npm, composer, bundler, uv, and nuget.
     required: false
     default: auto
 
@@ -76,6 +76,15 @@ runs:
         key: wodby-${{ runner.os }}-${{ runner.arch }}-uv-${{ hashFiles('**/uv.lock') }}
         restore-keys: |
           wodby-${{ runner.os }}-${{ runner.arch }}-uv-
+
+    - name: Restore NuGet cache
+      if: ${{ steps.cache.outputs.nuget == 'true' }}
+      uses: actions/cache@v5
+      with:
+        path: ~/.nuget/packages
+        key: wodby-${{ runner.os }}-${{ runner.arch }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj', '**/*.fsproj', '**/Directory.Packages.props') }}
+        restore-keys: |
+          wodby-${{ runner.os }}-${{ runner.arch }}-nuget-
 
     - name: Install Wodby CLI
       shell: bash

@@ -21,6 +21,7 @@ npm=false
 composer=false
 bundler=false
 uv=false
+nuget=false
 
 has_lockfile() {
   [[ -n "$(find "${root}" -type f -name "$1" -not -path '*/node_modules/*' -print -quit)" ]]
@@ -40,8 +41,11 @@ enable_profile() {
     uv)
       uv=true
       ;;
+    nuget)
+      nuget=true
+      ;;
     *)
-      echo "Unknown cache profile: $1 (supported: npm, composer, bundler, uv)" >&2
+      echo "Unknown cache profile: $1 (supported: npm, composer, bundler, uv, nuget)" >&2
       exit 1
       ;;
   esac
@@ -53,6 +57,8 @@ case "${cache_lower}" in
     if has_lockfile composer.lock; then composer=true; fi
     if has_lockfile Gemfile.lock; then bundler=true; fi
     if has_lockfile uv.lock; then uv=true; fi
+    # NuGet lock files are optional, so a .NET project file also selects the cache.
+    if has_lockfile packages.lock.json || has_lockfile '*.csproj' || has_lockfile '*.fsproj'; then nuget=true; fi
     ;;
   none|false|off)
     ;;
@@ -71,4 +77,5 @@ esac
   printf 'composer=%s\n' "${composer}"
   printf 'bundler=%s\n' "${bundler}"
   printf 'uv=%s\n' "${uv}"
+  printf 'nuget=%s\n' "${nuget}"
 } >> "${GITHUB_OUTPUT}"
